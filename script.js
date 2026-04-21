@@ -1,6 +1,6 @@
 
 /* ======================= script.js ======================= */
-
+console.log("JS loaded");
 AOS.init();
 
 const roles = ["Data Scientist","ML Engineer","NLP Enthusiast"];
