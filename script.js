@@ -28,9 +28,10 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = {
-    name: form.user_name.value,
-    email: form.user_email.value,
-    message: form.message.value
+  name: form.name.value,
+  email: form.email.value,
+  message: form.message.value
+};
   };
 
   try {
