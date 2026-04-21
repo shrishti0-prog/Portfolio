@@ -29,9 +29,7 @@ form.addEventListener("submit", async (e) => {
 
   const data = {
   name: form.name.value,
-  email: form.email.value,
-  message: form.message.value
-};
+email: form.email.value,
   };
 
   try {
