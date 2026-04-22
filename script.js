@@ -1,5 +1,6 @@
 
 /* ======================= script.js ======================= */
+alert("JS LOADED");
 console.log("JS loaded");
 AOS.init();
 
