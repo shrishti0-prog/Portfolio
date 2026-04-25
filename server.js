@@ -5,10 +5,16 @@ dotenv.config();
 import express from "express";
 import nodemailer from "nodemailer";
 import cors from "cors";
+import dns from "dns";
+
+// IMPORTANT: fixes Gmail IPv6 issue on Railway
+dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
 
-// CORS CONFIG (ONLY ONCE)
+/* =========================
+   CORS CONFIG (FIXED)
+========================= */
 const corsOptions = {
   origin: "https://shrishti0-prog.github.io",
   methods: ["GET", "POST", "OPTIONS"],
@@ -16,18 +22,24 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
-// BODY PARSING (ONLY ONCE)
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test route
+/* =========================
+   TEST ROUTE
+========================= */
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-// Contact route
+/* =========================
+   CONTACT ROUTE
+========================= */
 app.post("/send", async (req, res) => {
   try {
     console.log("BODY RECEIVED:", req.body);
@@ -54,7 +66,7 @@ app.post("/send", async (req, res) => {
       secure: false,
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASS,
+        pass: process.env.PASS, // Gmail App Password
       },
     });
 
@@ -70,6 +82,7 @@ app.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("EMAIL ERROR:", err);
+
     return res.status(500).json({
       success: false,
       error: "Email failed",
@@ -77,6 +90,11 @@ app.post("/send", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("Server running 🚀");
+/* =========================
+   START SERVER
+========================= */
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
 });
