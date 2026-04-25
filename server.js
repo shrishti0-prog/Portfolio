@@ -40,7 +40,6 @@ app.post("/send", async (req, res) => {
     pass: process.env.PASS,
   },
 });
-    });
 
     await transporter.sendMail({
       from: process.env.EMAIL,
