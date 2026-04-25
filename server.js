@@ -39,7 +39,9 @@ app.post("/send", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false });
+  console.log("EMAIL ERROR:", err); 
+  res.status(500).json({ success: false });
+}
   }
 });
 
