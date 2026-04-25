@@ -30,21 +30,21 @@ form.addEventListener("submit", async (e) => {
 
   const formData = new FormData(form);
 
-const data = {
-  name: formData.get("name"),
-  email: formData.get("email"),
-  message: formData.get("message"),
-};
+  const data = {
+    name: formData.get("name"),
+    email: formData.get("email"),
+    message: formData.get("message"),
+  };
 
-console.log("FORM DATA:", data); // 👈 keep this for testing
+  console.log("FORM DATA:", data);
 
   try {
     const res = await fetch("https://portfolio-production-ae93.up.railway.app/send", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     const result = await res.json();
@@ -55,7 +55,8 @@ console.log("FORM DATA:", data); // 👈 keep this for testing
     } else {
       status.innerText = "❌ Failed!";
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     status.innerText = "⚠ Server error";
   }
 });
