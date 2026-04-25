@@ -28,11 +28,15 @@ const status = document.getElementById("form-status");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const data = {
-  name: form.name.value,
-  email: form.email.value,
-  message: form.message.value
+  const formData = new FormData(form);
+
+const data = {
+  name: formData.get("name"),
+  email: formData.get("email"),
+  message: formData.get("message"),
 };
+
+console.log("FORM DATA:", data); // 👈 keep this for testing
 
   try {
     const res = await fetch("https://portfolio-production-ae93.up.railway.app/send", {
