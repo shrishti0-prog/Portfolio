@@ -30,12 +30,13 @@ app.post("/send", async (req, res) => {
       },
     });
 
-    await transporter.sendMail({
-      from: email,
-      to: process.env.EMAIL,
-      subject: `Portfolio Message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-    });
+   await transporter.sendMail({
+  from: process.env.EMAIL,
+  to: process.env.EMAIL,
+  replyTo: email,
+  subject: `Portfolio Message from ${name}`,
+  text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+});
 
     res.json({ success: true });
   } catch (err) {
