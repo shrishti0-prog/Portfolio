@@ -24,14 +24,14 @@ function type(){
 type();
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
+const btn = document.getElementById("submit-btn");
 
 let isSubmitting = false; // 👈 ADD THIS
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (isSubmitting) return; // 👈 PREVENT DUPLICATE
-  isSubmitting = true;
+  btn.disabled = true; // 👈 DISABLE BUTTON
 
   const formData = new FormData(form);
 
@@ -65,5 +65,5 @@ form.addEventListener("submit", async (e) => {
     status.innerText = "⚠ Server error";
   }
 
-  isSubmitting = false; // 👈 RESET
+  btn.disabled = false; // 👈 ENABLE AGAIN
 });
