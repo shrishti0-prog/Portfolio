@@ -47,16 +47,22 @@ app.get("/", (req, res) => {
 ========================= */
 app.post("/send", async (req, res) => {
   try {
-    console.log("BODY RECEIVED:", req.body);
-
     const { name, email, message } = req.body;
 
+    console.log("BODY RECEIVED:", req.body);
+
     if (!name || !email || !message) {
-      return res.status(400).json({ success: false, error: "Missing fields" });
+      return res.status(400).json({
+        success: false,
+        error: "Missing fields",
+      });
     }
 
     if (!process.env.EMAIL || !process.env.PASS) {
-      return res.status(500).json({ success: false, error: "ENV missing" });
+      return res.status(500).json({
+        success: false,
+        error: "ENV missing",
+      });
     }
 
     const transporter = nodemailer.createTransport({
@@ -81,15 +87,10 @@ app.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("EMAIL ERROR:", err);
-    return res.status(500).json({ success: false, error: "Email failed" });
+
+    return res.status(500).json({
+      success: false,
+      error: err.message, // now you will see real error
+    });
   }
-});
-
-/* =========================
-   START SERVER
-========================= */
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} 🚀`);
 });
