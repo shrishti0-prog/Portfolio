@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -7,7 +8,17 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
+// CORS CONFIG (ONLY ONCE)
+const corsOptions = {
+  origin: "https://shrishti0-prog.github.io",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+// BODY PARSING (ONLY ONCE)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,11 +35,17 @@ app.post("/send", async (req, res) => {
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
-      return res.status(400).json({ success: false, error: "Missing fields" });
+      return res.status(400).json({
+        success: false,
+        error: "Missing fields",
+      });
     }
 
     if (!process.env.EMAIL || !process.env.PASS) {
-      return res.status(500).json({ success: false, error: "ENV missing" });
+      return res.status(500).json({
+        success: false,
+        error: "ENV missing",
+      });
     }
 
     const transporter = nodemailer.createTransport({
@@ -37,7 +54,7 @@ app.post("/send", async (req, res) => {
       secure: false,
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASS, // Gmail App Password
+        pass: process.env.PASS,
       },
     });
 
@@ -53,7 +70,10 @@ app.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("EMAIL ERROR:", err);
-    return res.status(500).json({ success: false, error: "Email failed" });
+    return res.status(500).json({
+      success: false,
+      error: "Email failed",
+    });
   }
 });
 
