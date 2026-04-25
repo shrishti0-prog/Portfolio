@@ -1,4 +1,3 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -7,22 +6,21 @@ import nodemailer from "nodemailer";
 import cors from "cors";
 import dns from "dns";
 
-// IMPORTANT: fixes Gmail IPv6 issue on Railway
 dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
 
 /* =========================
-   CORS CONFIG (FIXED)
+   CORS (CRITICAL FIX)
 ========================= */
-const corsOptions = {
+app.use(cors({
   origin: "https://shrishti0-prog.github.io",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-};
+  allowedHeaders: ["Content-Type"]
+}));
 
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
+// IMPORTANT: handle ALL preflight requests
+app.options("*", cors());
 
 /* =========================
    MIDDLEWARE
@@ -34,11 +32,11 @@ app.use(express.urlencoded({ extended: true }));
    TEST ROUTE
 ========================= */
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend running 🚀");
 });
 
 /* =========================
-   CONTACT ROUTE
+   SEND EMAIL ROUTE
 ========================= */
 app.post("/send", async (req, res) => {
   try {
@@ -47,17 +45,7 @@ app.post("/send", async (req, res) => {
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing fields",
-      });
-    }
-
-    if (!process.env.EMAIL || !process.env.PASS) {
-      return res.status(500).json({
-        success: false,
-        error: "ENV missing",
-      });
+      return res.status(400).json({ success: false, error: "Missing fields" });
     }
 
     const transporter = nodemailer.createTransport({
@@ -66,7 +54,7 @@ app.post("/send", async (req, res) => {
       secure: false,
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASS, // Gmail App Password
+        pass: process.env.PASS,
       },
     });
 
@@ -82,19 +70,13 @@ app.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("EMAIL ERROR:", err);
-
-    return res.status(500).json({
-      success: false,
-      error: "Email failed",
-    });
+    return res.status(500).json({ success: false });
   }
 });
 
 /* =========================
    START SERVER
 ========================= */
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} 🚀`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log("Server running 🚀");
 });
