@@ -1,14 +1,14 @@
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const nodemailer = require("nodemailer");
-const cors = require("cors");
+import express from "express";
+import nodemailer from "nodemailer";
+import cors from "cors";
 
 const app = express();
+
 app.use(cors());
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Test route
@@ -19,29 +19,27 @@ app.get("/", (req, res) => {
 // Contact route
 app.post("/send", async (req, res) => {
   try {
-    console.log("BODY RECEIVED:", req.body); 
+    console.log("BODY RECEIVED:", req.body);
 
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
-      console.log("❌ VALIDATION FAILED"); 
-      return res.status(400).json({ success: false });
+      return res.status(400).json({ success: false, error: "Missing fields" });
     }
 
     if (!process.env.EMAIL || !process.env.PASS) {
-      console.log("ENV ERROR: Missing EMAIL or PASS");
-      return res.status(500).json({ success: false });
+      return res.status(500).json({ success: false, error: "ENV missing" });
     }
 
-    let transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASS,
-  },
-});
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS, // Gmail App Password
+      },
+    });
 
     await transporter.sendMail({
       from: process.env.EMAIL,
@@ -51,15 +49,14 @@ app.post("/send", async (req, res) => {
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
     });
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log("EMAIL ERROR:", err);
-    res.status(500).json({ success: false });
+    console.error("EMAIL ERROR:", err);
+    return res.status(500).json({ success: false, error: "Email failed" });
   }
 });
 
-// Start server
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(process.env.PORT || 5000, () => {
+  console.log("Server running 🚀");
 });
