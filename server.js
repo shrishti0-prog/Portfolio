@@ -5,9 +5,9 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 
 const app = express();
-
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
 // Test route
 app.get("/", (req, res) => {
@@ -17,9 +17,12 @@ app.get("/", (req, res) => {
 // Contact route
 app.post("/send", async (req, res) => {
   try {
+    console.log("BODY RECEIVED:", req.body); 
+
     const { name, email, message } = req.body;
 
     if (!name || !email || !message) {
+      console.log("❌ VALIDATION FAILED"); 
       return res.status(400).json({ success: false });
     }
 
