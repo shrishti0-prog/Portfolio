@@ -25,8 +25,13 @@ type();
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
 
+let isSubmitting = false; // 👈 ADD THIS
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  if (isSubmitting) return; // 👈 PREVENT DUPLICATE
+  isSubmitting = true;
 
   const formData = new FormData(form);
 
@@ -59,4 +64,6 @@ form.addEventListener("submit", async (e) => {
     console.log(err);
     status.innerText = "⚠ Server error";
   }
+
+  isSubmitting = false; // 👈 RESET
 });
