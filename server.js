@@ -3,27 +3,18 @@ dotenv.config();
 
 import express from "express";
 import nodemailer from "nodemailer";
-import cors from "cors";
 import dns from "dns";
 
-// Fix Gmail + Railway IPv6 issue
+// Fix Gmail + Railway network issue
 dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
 
 /* =========================
-   CORS CONFIG
-========================= */
-const corsOptions = {
-  origin: "https://shrishti0-prog.github.io",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-};
-
-app.use(cors(corsOptions));
-
-// IMPORTANT: NO "*" (prevents crash)
-app.options(/.*/, cors(corsOptions));
+   NO CORS MIDDLEWARE NEEDED
+   =========================
+   We manually allow all origins below
+*/
 
 /* =========================
    MIDDLEWARE
@@ -31,11 +22,24 @@ app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Manually handle CORS for ALL requests (safe + simple)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // allow all origins
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200); // handle preflight instantly
+  }
+
+  next();
+});
+
 /* =========================
-   HEALTH CHECK
+   TEST ROUTE
 ========================= */
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend running 🚀");
 });
 
 /* =========================
@@ -47,19 +51,12 @@ app.post("/send", async (req, res) => {
 
     const { name, email, message } = req.body;
 
-    // validation
     if (!name || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing fields",
-      });
+      return res.status(400).json({ success: false, error: "Missing fields" });
     }
 
     if (!process.env.EMAIL || !process.env.PASS) {
-      return res.status(500).json({
-        success: false,
-        error: "ENV variables missing",
-      });
+      return res.status(500).json({ success: false, error: "ENV missing" });
     }
 
     const transporter = nodemailer.createTransport({
@@ -68,7 +65,7 @@ app.post("/send", async (req, res) => {
       secure: false,
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASS, // Gmail App Password
+        pass: process.env.PASS,
       },
     });
 
@@ -84,11 +81,7 @@ app.post("/send", async (req, res) => {
 
   } catch (err) {
     console.error("EMAIL ERROR:", err);
-
-    return res.status(500).json({
-      success: false,
-      error: "Email failed",
-    });
+    return res.status(500).json({ success: false, error: "Email failed" });
   }
 });
 
