@@ -10,14 +10,16 @@ dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
 
-/* =========================
-   CORS (CRITICAL FIX)
-========================= */
 const corsOptions = {
   origin: "https://shrishti0-prog.github.io",
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 };
+
+app.use(cors(corsOptions));
+
+// IMPORTANT FIX (NO "*")
+app.options(/.*/, cors(corsOptions));
 
 app.use(cors(corsOptions));
 
