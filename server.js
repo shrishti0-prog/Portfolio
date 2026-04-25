@@ -8,20 +8,26 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
+// Test route
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
-// Route
+
+// Contact route
 app.post("/send", async (req, res) => {
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ success: false });
-  }
-
   try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false });
+    }
+
+    if (!process.env.EMAIL || !process.env.PASS) {
+      console.log("ENV ERROR: Missing EMAIL or PASS");
+      return res.status(500).json({ success: false });
+    }
+
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -30,21 +36,23 @@ app.post("/send", async (req, res) => {
       },
     });
 
-   await transporter.sendMail({
-  from: process.env.EMAIL,
-  to: process.env.EMAIL,
-  replyTo: email,
-  subject: `Portfolio Message from ${name}`,
-  text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-});
+    await transporter.sendMail({
+      from: process.env.EMAIL,
+      to: process.env.EMAIL,
+      replyTo: email,
+      subject: `Portfolio Message from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+    });
 
     res.json({ success: true });
+
   } catch (err) {
-  console.log("EMAIL ERROR:", err); 
-  res.status(500).json({ success: false });
-}
+    console.log("EMAIL ERROR:", err);
+    res.status(500).json({ success: false });
   }
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
-console.log("updated");
+// Start server
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});
